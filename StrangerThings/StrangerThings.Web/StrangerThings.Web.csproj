@@ -15,4 +15,10 @@
     <ProjectReference Include="..\StrangerThings.Game\StrangerThings.Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Pages\IndexOld.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

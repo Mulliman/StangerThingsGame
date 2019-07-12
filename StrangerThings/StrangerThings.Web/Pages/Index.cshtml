@@ -4,35 +4,210 @@
     ViewData["Title"] = "Home page";
 }
 
-@{
-    var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
-    var gameFactory = new StrangerThings.Game.GameFactory(new GoogleTranslator.Translator(@"D:\Development\Redweb\StrangerThings\StrangerThings\StrangerThings.Web\strangerthings.json"));
+<h3 class="gameId" style="display:none;">@Model.Game.Id</h3>
 
-    var gameService = new StrangerThings.Game.GameService(cache, gameFactory);
+<style>
+    .div {
+        position: relative;
+        margin: 1em auto;
+        width: 800px;
+    }
 
-    var game = gameService.CreateNewGame();
+    canvas {
+        display: block;
+        position: relative;
+        background: #000;
+        border: 1px solid #ccc
+    }
 
-}
+    .img {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 101%;
+        height: 100%;
+    }
 
-<h1 class="gameId">@game.Id</h1>
-<h2>@game.Language</h2>
+    nav {
+        margin-bottom: 20px;
+    }
 
-@foreach (var p in game.PhrasesInEnglish)
-{
-    <p>@p</p>
-}
+    .hint {
+        color: white;
+        margin: 20px;
+        text-align: center;
+    }
 
-@foreach (var p in game.PhrasesInLanguage)
-{
-    <p class="readThis">@p</p>
-}
+    .dustins-radio {
+        max-width: 100%;
+        cursor: pointer;
+    }
 
-<h2>@game.Answer.Place.Name + @game.Answer.Time</h2>
+    .dustin, .steve, .robin {
+        background-color: black;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    textarea{
+        margin: 0 20px 20px;
+        width:100%;
+        height:300px;
+    }
+</style>
 
 <script>
-    var clickedAlready = false;
 
-    function js() {
+    function showMall() {
+        var canvas = document.getElementsByTagName('canvas')[0];
+        canvas.width = 800;
+        canvas.height = 600;
+
+        var gkhead = new Image;
+
+        var ctx = canvas.getContext('2d');
+        trackTransforms(ctx);
+
+        function redraw() {
+
+            // Clear the entire canvas
+            var p1 = ctx.transformedPoint(0, 0);
+            var p2 = ctx.transformedPoint(canvas.width, canvas.height);
+            ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+
+            ctx.drawImage(gkhead, 0, 0);
+            //ctx.drawImage(binos, 0, 0);
+        }
+        redraw();
+
+        var lastX = canvas.width / 2, lastY = canvas.height / 2;
+
+        var dragStart, dragged;
+
+        canvas.addEventListener('mousedown', function (evt) {
+            document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+            dragStart = ctx.transformedPoint(lastX, lastY);
+            dragged = false;
+        }, false);
+
+        canvas.addEventListener('mousemove', function (evt) {
+            lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+            lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+            dragged = true;
+            if (dragStart) {
+                var pt = ctx.transformedPoint(lastX, lastY);
+                ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
+                redraw();
+            }
+        }, false);
+
+        canvas.addEventListener('mouseup', function (evt) {
+            dragStart = null;
+            if (!dragged) zoom(evt.shiftKey ? -1 : 1);
+        }, false);
+
+        var scaleFactor = 1;
+
+        var zoom = function (clicks) {
+            var pt = ctx.transformedPoint(lastX, lastY);
+            ctx.translate(pt.x, pt.y);
+            //var factor = Math.pow(scaleFactor, clicks);
+            //ctx.scale(factor, factor);
+            //ctx.translate(-pt.x, -pt.y);
+            redraw();
+        }
+
+        gkhead.src = '/images/shops.jpg';
+
+        // Adds ctx.getTransform() - returns an SVGMatrix
+        // Adds ctx.transformedPoint(x,y) - returns an SVGPoint
+        function trackTransforms(ctx) {
+            var svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            var xform = svg.createSVGMatrix();
+            ctx.getTransform = function () { return xform; };
+
+            var savedTransforms = [];
+            var save = ctx.save;
+            ctx.save = function () {
+                savedTransforms.push(xform.translate(0, 0));
+                return save.call(ctx);
+            };
+
+            var restore = ctx.restore;
+            ctx.restore = function () {
+                xform = savedTransforms.pop();
+                return restore.call(ctx);
+            };
+
+            var scale = ctx.scale;
+            ctx.scale = function (sx, sy) {
+                xform = xform.scaleNonUniform(sx, sy);
+                return scale.call(ctx, sx, sy);
+            };
+
+            var rotate = ctx.rotate;
+            ctx.rotate = function (radians) {
+                xform = xform.rotate(radians * 180 / Math.PI);
+                return rotate.call(ctx, radians);
+            };
+
+            var translate = ctx.translate;
+            ctx.translate = function (dx, dy) {
+                xform = xform.translate(dx, dy);
+                return translate.call(ctx, dx, dy);
+            };
+
+            var transform = ctx.transform;
+            ctx.transform = function (a, b, c, d, e, f) {
+                var m2 = svg.createSVGMatrix();
+                m2.a = a; m2.b = b; m2.c = c; m2.d = d; m2.e = e; m2.f = f;
+                xform = xform.multiply(m2);
+                return transform.call(ctx, a, b, c, d, e, f);
+            };
+
+            var setTransform = ctx.setTransform;
+            ctx.setTransform = function (a, b, c, d, e, f) {
+                xform.a = a;
+                xform.b = b;
+                xform.c = c;
+                xform.d = d;
+                xform.e = e;
+                xform.f = f;
+                return setTransform.call(ctx, a, b, c, d, e, f);
+            };
+
+            var pt = svg.createSVGPoint();
+            ctx.transformedPoint = function (x, y) {
+                pt.x = x; pt.y = y;
+                return pt.matrixTransform(xform.inverse());
+            }
+        }
+    }
+
+</script>
+
+@foreach (var p in Model.Game.PhrasesInLanguage)
+{
+    <p class="readThis" style="display:none">@p</p>
+}
+
+<script>
+    // ==============
+    // DUSTIN
+    // ==============
+
+    var clickedAlready = false;
+    var messageInterval;
+
+    function playRadio() {
         console.log("hello");
         if (clickedAlready) {
             return;
@@ -51,26 +226,127 @@
         console.log(textToRead);
 
         var msg = new SpeechSynthesisUtterance(textToRead);
-        msg.lang = '@game.Language';
+        msg.lang = '@Model.Game.Language';
         msg.rate = 0.9;
 
         window.speechSynthesis.speak(msg);
-        setInterval(function () {
+        messageInterval = setInterval(function () {
             window.speechSynthesis.speak(msg);
         }, 10000);
     }
 
 </script>
 
-<button onclick="js()">
-    Read stuff
-</button>
+<script>
+    var $dustin;
+    var $steve;
+    var $robin;
 
+    function hideAll() {
+        $dustin.style.display = "none";
+        $steve.style.display = "none";
+        $robin.style.display = "none";
+
+        if (messageInterval) {
+            clearInterval(messageInterval);
+            clickedAlready = false;
+        }
+    }
+
+    function show(el) {
+        el.style.display = "block";
+    }
+
+    function loadDustin() {
+        hideAll();
+
+        show($dustin);
+    }
+
+    function loadSteve() {
+        hideAll();
+
+
+        showMall();
+
+        show($steve);
+    }
+
+    function loadRobin() {
+        hideAll();
+
+
+
+
+        show($robin);
+    }
+
+
+
+</script>
+
+
+
+
+
+<nav class="">
+    <div class="container characters">
+        <div class="col-sm-6">
+            <h1>Stranger Things Puzzle</h1>
+        </div>
+        <div class="col-sm-2">
+            <img src="~/images/dustin.jpg" onclick="loadDustin()" />
+        </div>
+        <div class="col-sm-2">
+            <img src="~/images/steve.jpg" onclick="loadSteve()" />
+        </div>
+        <div class="col-sm-2">
+            <img src="~/images/robin.jpg" onclick="loadRobin()" />
+        </div>
+    </div>
+</nav>
+
+<!--
+    ==============================
+    Dustin
+    ==============================
+-->
+
+
+<div class="container dustin">
+    <div class="col-sm-10 col-sm-push-1">
+        <h2 class="hint">Click radio to hear message</h2>
+        <img src="~/images/radio.png" class="dustins-radio" onclick="playRadio()" />
+    </div>
+</div>
+
+<!--
+    ==============================
+    Steve
+    ==============================
+-->
+
+<div class="container steve">
+    <div class="col-sm-10  col-sm-push-1">
+        <h2 class="hint">Click and drag to survey the mall</h2>
+        <div class="div">
+            <canvas></canvas>
+            <img class="img" src="images/binos.png" />
+        </div>
+    </div>
+</div>
+
+<!--
+    ==============================
+    ROBIN
+    ==============================
+-->
 
 <script>
     function doTranslate() {
         var lang = document.getElementsByClassName("langToTranslateFrom")[0].value;
         var text = document.getElementsByClassName("textToTranslate")[0].value;
+        var $result = document.getElementsByClassName("translateResult")[0];
 
         fetch('/api/translate/' + lang + "/" + text)
             .then(function (response) {
@@ -78,24 +354,10 @@
                 return response.text();
             })
             .then(function (t) {
-                console.log(t);
+                $result.innerText = t;
             });
     }
 </script>
-
-<div>
-
-    <select class="langToTranslateFrom">
-        <option value="fr">fr</option>
-        <option value="it">it</option>
-
-    </select>
-    <input class="textToTranslate" type="text" />
-
-
-    <button onclick="doTranslate()">Translate</button>
-
-</div>
 
 <script>
     function checkAnswer() {
@@ -110,25 +372,124 @@
             })
             .then(function (t) {
                 console.log(t);
+
+                if (t.locationCorrect && t.timeCorrect) {
+                    alert("You were correct!");
+                } else {
+                    alert("Your were wrong. The correct answer was " + t.answer);
+                }
             });
     }
 </script>
 
+<style>
+    .langToTranslateFrom,
+    .textToTranslate {
+        width: 100%;
+        display: block;
+        margin-bottom:20px;
+        padding:10px;
+    }
 
-<div>
+    .translateResult{
+        padding:20px;
+        background:white;
+        color:#444;
+        margin:20px 0;
+    }
 
-    <select class="placeAnswer">
-        <option value="Shark Shoes">Shark Shoes</option>
-        <option value="Dog DIY">Dog DIY</option>
-        <option value="Ant Art">Ant ArtY</option>
-    </select>
+    .translateButton{
+        width:100%;
+        padding:20px;
+        text-align:center;
+        color:#000;
+    }
 
-    <select class="timeAnswer">
-        <option value="1200">12:00</option>
-        <option value="315">3:15</option>
-        <option value="945">9:45</option>
-    </select>
+    .robin h3{
+        color:#eee;
+        margin-bottom:20px;
+    }
+</style>
 
-    <button onclick="checkAnswer()">Check Answer</button>
+<div class="container robin">
+    <h2 class="hint">Use the dictionary to break the code</h2>
 
+    <div class="col-sm-5 col-sm-push-1 dictionary">
+        <h3>
+            Dictionary
+        </h3>
+
+        <select class="langToTranslateFrom">
+            <option value="fr">French</option>
+            <option value="it">Italian</option>
+            <option value="es">Spanish</option>
+        </select>
+
+        <input class="textToTranslate" type="text" placeholder="Type text to translate here..." />
+
+        <button class="translateButton" onclick="doTranslate()">Translate</button>
+
+        <p class="translateResult">
+
+        </p>
+    </div>
+
+    <div class="col-sm-5 col-sm-push-1 notepad">
+        <h3>
+            Make your notes here
+        </h3>
+        <textarea>
+ 
+        </textarea>
+    </div>
 </div>
+
+<style>
+    .answer {
+        background: #0c6419;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        margin-top:40px;
+    }
+
+    .answer .col-sm-4{
+        text-align:center;
+    }
+
+        .answer select{
+            padding:10px;
+        }
+</style>
+
+<div class="container answer">
+    <div class="col-sm-4">
+        <label>Where?</label>
+        <select class="placeAnswer">
+            <option value="Shark Shoes">Shark Shoes</option>
+            <option value="Dog DIY">Dog DIY</option>
+            <option value="Ant Art">Ant ArtY</option>
+        </select>
+    </div>
+
+    <div class="col-sm-4">
+        <label>When?</label>
+        <select class="timeAnswer">
+            <option value="1200">12:00</option>
+            <option value="315">3:15</option>
+            <option value="945">9:45</option>
+        </select>
+    </div>
+
+    <div class="col-sm-4">
+        <button onclick="checkAnswer()">Check Answer</button>
+    </div>
+ </div>
+
+
+<script>
+    $dustin = document.getElementsByClassName("dustin")[0];
+    $steve = document.getElementsByClassName("steve")[0];
+    $robin = document.getElementsByClassName("robin")[0];
+
+    hideAll();
+</script>
