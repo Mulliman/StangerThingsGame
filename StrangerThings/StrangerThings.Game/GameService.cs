@@ -15,14 +15,14 @@ namespace StrangerThings.Game
 
         public Game GetGameFromId(string id)
         {
-            return _cache.Get<Game>(GetGameCacheId(id));
+            return FakeCache.Get(id);
         }
 
         public Game CreateNewGame()
         {
             var game = _gameFactory.CreateGame();
 
-            _cache.Set(GetGameCacheId(game), game);
+            FakeCache.Add(game);
 
             return game;
         }

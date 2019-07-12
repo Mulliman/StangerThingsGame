@@ -33,9 +33,14 @@ namespace StrangerThings.Game
 
     public class Time : HasPhrases
     {
-        public int Hour { get; set; }
+        public string Hour { get; set; }
 
-        public int Minutes { get; set; }
+        public string Minutes { get; set; }
+        
+        public override string ToString()
+        {
+            return $"{Hour}{Minutes}";
+        }
     }
 
     public class Place : HasPhrases

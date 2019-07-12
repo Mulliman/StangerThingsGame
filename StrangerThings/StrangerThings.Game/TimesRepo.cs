@@ -23,8 +23,8 @@ namespace StrangerThings.Game
     {
         public Noon()
         {
-            Hour = 12;
-            Minutes = 0;
+            Hour = "12";
+            Minutes = "00";
 
             Phrases = new[]
             {
@@ -40,8 +40,8 @@ namespace StrangerThings.Game
     {
         public NineFortyFive()
         {
-            Hour = 9;
-            Minutes = 45;
+            Hour = "9";
+            Minutes = "45";
 
             Phrases = new[]
             {
@@ -57,8 +57,8 @@ namespace StrangerThings.Game
     {
         public ThreeFifteen()
         {
-            Hour = 9;
-            Minutes = 45;
+            Hour = "3";
+            Minutes = "15";
 
             Phrases = new[]
             {

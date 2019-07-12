@@ -14,7 +14,7 @@
 
 }
 
-<h1>@game.Id</h1>
+<h1 class="gameId">@game.Id</h1>
 <h2>@game.Language</h2>
 
 @foreach (var p in game.PhrasesInEnglish)
@@ -27,7 +27,7 @@
     <p class="readThis">@p</p>
 }
 
-<h2>@game.Answer.Place.Name + @game.Answer.Time.Hour:@game.Answer.Time.Minutes</h2>
+<h2>@game.Answer.Place.Name + @game.Answer.Time</h2>
 
 <script>
     var clickedAlready = false;
@@ -94,5 +94,41 @@
 
 
     <button onclick="doTranslate()">Translate</button>
+
+</div>
+
+<script>
+    function checkAnswer() {
+        var place = document.getElementsByClassName("placeAnswer")[0].value;
+        var time = document.getElementsByClassName("timeAnswer")[0].value;
+        var id = document.getElementsByClassName("gameId")[0].innerText;
+
+        fetch('/api/answer/' + id + "/" + place + "/" + time)
+            .then(function (response) {
+                console.log(response);
+                return response.json();
+            })
+            .then(function (t) {
+                console.log(t);
+            });
+    }
+</script>
+
+
+<div>
+
+    <select class="placeAnswer">
+        <option value="Shark Shoes">Shark Shoes</option>
+        <option value="Dog DIY">Dog DIY</option>
+        <option value="Ant Art">Ant ArtY</option>
+    </select>
+
+    <select class="timeAnswer">
+        <option value="1200">12:00</option>
+        <option value="315">3:15</option>
+        <option value="945">9:45</option>
+    </select>
+
+    <button onclick="checkAnswer()">Check Answer</button>
 
 </div>
