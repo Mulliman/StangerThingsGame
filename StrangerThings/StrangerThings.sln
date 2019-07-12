@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrangerThings.Web", "StrangerThings.Web\StrangerThings.Web.csproj", "{4C49D393-EA6A-43D9-8D29-E45C2660934D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrangerThings.Game", "StrangerThings.Game\StrangerThings.Game.csproj", "{7C14D4F7-6690-46C8-8440-3DD488C15F46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleTranslator", "GoogleTranslator\GoogleTranslator.csproj", "{8239F970-FF4B-4E44-ADB9-9E8ECB2D1032}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{4C49D393-EA6A-43D9-8D29-E45C2660934D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C49D393-EA6A-43D9-8D29-E45C2660934D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C49D393-EA6A-43D9-8D29-E45C2660934D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C14D4F7-6690-46C8-8440-3DD488C15F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C14D4F7-6690-46C8-8440-3DD488C15F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C14D4F7-6690-46C8-8440-3DD488C15F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C14D4F7-6690-46C8-8440-3DD488C15F46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8239F970-FF4B-4E44-ADB9-9E8ECB2D1032}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8239F970-FF4B-4E44-ADB9-9E8ECB2D1032}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8239F970-FF4B-4E44-ADB9-9E8ECB2D1032}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8239F970-FF4B-4E44-ADB9-9E8ECB2D1032}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

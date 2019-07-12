@@ -4,3 +4,95 @@
     ViewData["Title"] = "Home page";
 }
 
+@{
+    var cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
+    var gameFactory = new StrangerThings.Game.GameFactory(new GoogleTranslator.Translator(@"D:\Development\Redweb\StrangerThings\StrangerThings\StrangerThings.Web\strangerthings.json"));
+
+    var gameService = new StrangerThings.Game.GameService(cache, gameFactory);
+
+    var game = gameService.CreateNewGame();
+
+}
+
+<h1>@game.Id</h1>
+<h2>@game.Language</h2>
+
+@foreach (var p in game.PhrasesInEnglish)
+{
+    <p>@p</p>
+}
+
+@foreach (var p in game.PhrasesInLanguage)
+{
+    <p class="readThis">@p</p>
+}
+
+<h2>@game.Answer.Place.Name + @game.Answer.Time.Hour:@game.Answer.Time.Minutes</h2>
+
+<script>
+    var clickedAlready = false;
+
+    function js() {
+        console.log("hello");
+        if (clickedAlready) {
+            return;
+        }
+
+        clickedAlready = true;
+
+        var phrases = document.getElementsByClassName("readThis");
+
+        var i;
+        var textToRead = "";
+        for (i = 0; i < phrases.length; i++) {
+            textToRead += " " + phrases[i].innerText;
+        }
+
+        console.log(textToRead);
+
+        var msg = new SpeechSynthesisUtterance(textToRead);
+        msg.lang = '@game.Language';
+        msg.rate = 0.9;
+
+        window.speechSynthesis.speak(msg);
+        setInterval(function () {
+            window.speechSynthesis.speak(msg);
+        }, 10000);
+    }
+
+</script>
+
+<button onclick="js()">
+    Read stuff
+</button>
+
+
+<script>
+    function doTranslate() {
+        var lang = document.getElementsByClassName("langToTranslateFrom")[0].value;
+        var text = document.getElementsByClassName("textToTranslate")[0].value;
+
+        fetch('/api/translate/' + lang + "/" + text)
+            .then(function (response) {
+                console.log(response);
+                return response.text();
+            })
+            .then(function (t) {
+                console.log(t);
+            });
+    }
+</script>
+
+<div>
+
+    <select class="langToTranslateFrom">
+        <option value="fr">fr</option>
+        <option value="it">it</option>
+
+    </select>
+    <input class="textToTranslate" type="text" />
+
+
+    <button onclick="doTranslate()">Translate</button>
+
+</div>
